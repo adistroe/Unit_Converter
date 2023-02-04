@@ -137,17 +137,14 @@ class UnitConverter {
         isInputUnit: Boolean = false,
         isOutputUnit: Boolean = false
     ): Unit {
-        var firstIndex = if (isInputUnit) 1 else userInput.lastIndex
-
-        if (userInput[firstIndex] in Unit.allUnitNames()) {
-            return Unit.matchUnitByName(userInput[firstIndex])
+        val input = if (isInputUnit) userInput else userInput.reversed()
+        if (input[0] in Unit.allUnitNames()) {
+            return Unit.matchUnitByName(input[0])
         } else {
-            firstIndex = if (isInputUnit) 1 else userInput.lastIndex - 1
-            val nextIndex = if (isInputUnit) 2 else userInput.lastIndex
-            if (userInput[firstIndex] in listOf("degree", "degrees")
-                && userInput[nextIndex] in listOf("celsius", "fahrenheit")
+            if (input[0] in listOf("degree", "degrees")
+                && input[1] in listOf("celsius", "fahrenheit")
             ) {
-                return Unit.matchUnitByName("${userInput[firstIndex]} ${userInput[nextIndex]}")
+                return Unit.matchUnitByName("${input[0]} ${input[1]}")
             }
         }
 
@@ -170,8 +167,9 @@ class UnitConverter {
             return listOf(Message.INPUT_NOT_VALID.text)
         }
 
-        val fromUnit = getUnitFrom(inputList, isInputUnit = true)
-        val toUnit = getUnitFrom(inputList, isOutputUnit = true)
+        val inputListWithoutNumber = inputList - inputList.first()
+        val fromUnit = getUnitFrom(inputListWithoutNumber, isInputUnit = true)
+        val toUnit = getUnitFrom(inputListWithoutNumber, isOutputUnit = true)
 
         val isValidUnits = (fromUnit.type != UnitType.UNKNOWN) && (fromUnit.type == toUnit.type)
         if (!isValidUnits) {
